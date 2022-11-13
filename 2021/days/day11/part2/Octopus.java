@@ -1,4 +1,4 @@
-package days.day11.part1;
+package days.day11.part2;
 
 public class Octopus {
     private int _energyLevel;

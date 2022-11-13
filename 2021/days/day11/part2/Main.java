@@ -1,4 +1,4 @@
-package days.day11.part1;
+package days.day11.part2;
 
 import java.util.ArrayList;
 import java.util.Queue;
@@ -61,7 +61,7 @@ public class Main {
 		// TODO: Run though the list multiple time finding glowing points.
 		// Each time, claculate the new vaules, then add all NEW glowing points
 		// to a list to be run through again and so on.
-		final int NUM_OF_ROUNDS = 100;
+		final int NUM_OF_ROUNDS = 10000;
 
 		System.out.println("ROUND: " + 0);
 		System.out.println(grid);
@@ -91,6 +91,11 @@ public class Main {
 						}
 					}
 				}
+			}
+
+			if (num_glowing == grid.getSize()[0] * grid.getSize()[1]) {
+				System.out.println("ROUND: " + (i + 1));
+				break;
 			}
 
 			total_flashes += checked.size();
