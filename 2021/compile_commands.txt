@@ -1,0 +1,4 @@
+~/Apps/jdk-17.0.1/bin/javac -d ./bin Main.java
+
+cd bin
+~/Apps/jdk-17.0.1/bin/java ./Main
