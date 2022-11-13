@@ -1,4 +1,4 @@
-~/Apps/jdk-17.0.1/bin/javac -d ./bin Main.java
+javac -d ./bin [additional java modules] [additional java files] Main.java
 
 cd bin
-~/Apps/jdk-17.0.1/bin/java ./Main
+java [package name].Main
