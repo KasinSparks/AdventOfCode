@@ -7,34 +7,51 @@
 
 class rps_player {
 private:
+	uint8_t get_score(const char &hand) const {
+		uint8_t score = 0;
+		switch (hand) {
+			case 'A': score = 1; break;
+			case 'B': score = 2; break;
+			case 'C': score = 3; break;
+		}
+
+		return score;
+	}
+
 	uint16_t clacluate_score(const char &opponet_hand, const char &players_hand) const {
 		uint16_t score = 0;
-		char adj_players_hand;
 		
 		// Get the value from the hand the player showed
 		switch (players_hand) {
-			case 'X': { score += 1; adj_players_hand = 'A'; break; }
-			case 'Y': { score += 2; adj_players_hand = 'B'; break; }
-			case 'Z': { score += 3; adj_players_hand = 'C'; break; }
+			case 'X': { score += 0; break; }
+			case 'Y': { score += 3; break; }
+			case 'Z': { score += 6; break; }
 			default: throw new std::exception();
 		}
 
-		// Get the value from win or loss
-		if (adj_players_hand == opponet_hand) {
-			// Tie
-			score += 3;
-		} else if (opponet_hand == 'A' && adj_players_hand == 'B') {
-			// Win
-			score += 6;
-		} else if (opponet_hand == 'B' && adj_players_hand == 'C') {
-			// Win
-			score += 6;
-		} else if (opponet_hand == 'C' && adj_players_hand == 'A') {
-			// Win
-			score += 6;
+
+		// Determine the hand needed
+		if (players_hand == 'Y') {
+			// Draw
+			score += this->get_score(opponet_hand);
+		} else if (players_hand == 'X') {
+			// Lose
+			if (opponet_hand == 'A') {
+				score += get_score('C');
+			} else if (opponet_hand == 'B') {
+				score += get_score('A');
+			} else if (opponet_hand == 'C') {
+				score += get_score('B');
+			}
 		} else {
-			// Loss
-			score += 0;
+			// Win
+			if (opponet_hand == 'A') {
+				score += get_score('B');
+			} else if (opponet_hand == 'B') {
+				score += get_score('C');
+			} else if (opponet_hand == 'C') {
+				score += get_score('A');
+			}
 		}
 
 		return score;
