@@ -8,7 +8,9 @@
 #include <list>
 
 /// Read a file's contents into memory.
-/// Memory allocated needs to be freed
 std::list<std::string> read_file(const std::string &file);
+
+/// Read a file's contents into memory.
+void read_file(std::list<std::string> &str_list, const std::string &file);
 
 #endif
