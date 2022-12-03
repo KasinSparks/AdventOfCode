@@ -14,11 +14,25 @@ int main() {
 	
 	uint32_t total = 0;
 
+	
+	uint32_t count = 0;
+	rucksack rs;
 	for (std::string str_data : file_data) {
 		//std::cout << str_data << std::endl;
-		rucksack rs(str_data);
-		total += rs.get_duplicate_item_priority();
+		if (count >= 3) {
+			std::cout << "Item priority: " << rs.get_item_priority() << std::endl;
+			total += rs.get_item_priority();
+			rs = rucksack();
+			count = 0;
+		}
+
+		rs.add_line(str_data);
+		count++;
 	}
+
+	// get the last one
+	std::cout << "Item priority: " << rs.get_item_priority() << std::endl;
+	total += rs.get_item_priority();
 
 	std::cout << "Total: " << total << std::endl;
 }
