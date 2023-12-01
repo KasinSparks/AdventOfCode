@@ -23,8 +23,16 @@ public:
 	bool operator!= (const aoc_point &p) const;
 	aoc_point operator+(const aoc_point &p) const;
 	void operator+=(const aoc_point &p);
+	bool operator< (const aoc_point &p) const;
 
 	std::string to_string() const;
 };
+
+template<> struct std::hash<aoc_point> {
+	std::size_t operator()(const aoc_point &p) const {
+		return std::hash<std::string>{}(p.to_string());
+	}
+};
+
 
 #endif

@@ -67,6 +67,11 @@ aoc_point::operator+=(const aoc_point &p) {
 	this->_y += p.get_y();
 }
 
+bool
+aoc_point::operator<(const aoc_point &p) const {
+	return this->_x < p.get_x() && this->_y < p.get_y();
+}
+
 std::string
 aoc_point::to_string() const {
 	return std::to_string(this->_x) + "," + std::to_string(this->_y);

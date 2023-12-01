@@ -1,6 +1,7 @@
 #ifndef AOC_GRID_HPP
 #define AOC_GRID_HPP
 
+#include "aoc_point.hpp"
 #include <cstdint>
 #include <exception>
 #include <iostream>
@@ -27,28 +28,6 @@ protected:
 		return true;
 	}
 	
-	/// If value is -1, then it is out of bounds
-	void get_neighbors(const uint32_t &x, const uint32_t &y, T *neighbors) const {
-		// Get the neighborhood
-		for (int i = 0; i < 9; ++i) {
-			try {
-				neighbors[i] = this->get(x + (i % 3) - 1, y + (i / 3) - 1);
-			} catch (std::exception *ex) {
-				neighbors[i] = -1;	
-				delete ex;
-			}
-		}
-	
-		/*
-		for (int i = 1; i < 10; ++i) {
-			std::cout << neighbors[i - 1] << ", ";
-			if (i % 3 == 0) {
-				std::cout << std::endl;
-			}
-		}
-		std::cout << std::endl;
-		*/
-	}
 public:
 	aoc_grid(const uint32_t &width, const uint32_t &height);
 	~aoc_grid();
@@ -56,11 +35,18 @@ public:
 	/// 0 to size - 1
 	void set(const uint32_t &x, const uint32_t &y, const T &data);
 	const T get(const uint32_t &x, const uint32_t &y) const;
+	const T get(const aoc_point &point) const;
 
 	const uint32_t get_width() const;
 	const uint32_t get_height() const;
 
 	void print();
+
+	/// If value is -1, then it is out of bounds
+	void get_neighbors(const uint32_t &x, const uint32_t &y, T *neighbors) const;
+	void get_neighbors(const aoc_point &point, T *neighbors) const;
+	void get_neighbors(const aoc_point &point, aoc_point *neighbors) const;
+
 };
 
 template <typename T>
@@ -120,5 +106,49 @@ template <typename T>
 const uint32_t
 aoc_grid<T>::get_height() const {
 	return this->_height;
+}
+
+template <typename T> 
+void
+aoc_grid<T>::get_neighbors(const uint32_t &x, const uint32_t &y, T *neighbors) const {
+	// Get the neighborhood
+	for (int i = 0; i < 9; ++i) {
+		try {
+			neighbors[i] = this->get(x + (i % 3) - 1, y + (i / 3) - 1);
+		} catch (std::exception *ex) {
+			neighbors[i] = -1;	
+			delete ex;
+		}
+	}
+
+	/*
+	for (int i = 1; i < 10; ++i) {
+		std::cout << neighbors[i - 1] << ", ";
+		if (i % 3 == 0) {
+			std::cout << std::endl;
+		}
+	}
+	std::cout << std::endl;
+	*/
+}
+
+template<typename T>
+void
+aoc_grid<T>::get_neighbors(const aoc_point &point, T *neighbors) const {
+	this->get_neighbors(point.get_x(), point.get_y(), neighbors);
+}
+
+template<typename T>
+void
+aoc_grid<T>::get_neighbors(const aoc_point &point, aoc_point *neighbors) const {
+	for (int i = 0; i < 9; ++i) {
+		neighbors[i] = aoc_point(point.get_x() + (i % 3) - 1, point.get_y() + (i / 3) - 1);
+	}
+}
+
+template <typename T>
+const T
+aoc_grid<T>::get(const aoc_point &point) const {
+	return this->get(point.get_x(), point.get_y());
 }
 #endif
