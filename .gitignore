@@ -1,3 +1,6 @@
 venv/*
 *.class
 **/bin/*
+.vscode
+2023/target/*
+Cargo.lock
