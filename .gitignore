@@ -3,4 +3,6 @@ venv/*
 **/bin/*
 .vscode
 2023/target/*
+2023/**/*.txt
 Cargo.lock
+
