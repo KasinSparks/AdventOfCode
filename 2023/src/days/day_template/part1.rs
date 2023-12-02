@@ -12,11 +12,6 @@ mod tests {
 
     #[test]
     fn practice_result() {
-        assert_eq!(sln("./src/days/day_01/practice_input.txt"), 0);
-    }
-
-    #[test]
-    fn final_result() {
-        assert_eq!(sln("./src/days/day_01/input.txt"), 0);
+        assert_eq!(sln("./src/days/day_00/practice_input.txt"), 0);
     }
 }
