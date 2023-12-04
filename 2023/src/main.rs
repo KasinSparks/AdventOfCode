@@ -11,6 +11,8 @@ fn main() {
     //let result = day_02::part1::sln("./src/days/day_02/input.txt");
     //let result = day_02::part2::sln("./src/days/day_02/input.txt");
     //let result = day_03::part1::sln("./src/days/day_03/input.txt");
-    let result = day_03::part2::sln("./src/days/day_03/input.txt");
+    //let result = day_03::part2::sln("./src/days/day_03/input.txt");
+    //let result = day_04::part1::sln("./src/days/day_04/input.txt");
+    let result = day_04::part2::sln("./src/days/day_04/input.txt");
     println!("Result: {}", result);
 }
