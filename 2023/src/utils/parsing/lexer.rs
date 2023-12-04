@@ -7,6 +7,16 @@ pub struct Token {
     data: String,
 }
 
+impl Token {
+    pub fn get_token_type(&self) -> TokenType {
+        return self.token_type;
+    }
+
+    pub fn get_data(&self) -> &str {
+        return self.data.as_str();
+    }
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TokenType {
     WORD,
@@ -17,6 +27,7 @@ pub enum TokenType {
     WHITESPACE,
     DOT,
     COMMA,
+    PIPE,
     UNKNOWN,
 }
 
@@ -59,6 +70,8 @@ impl Lexer {
                 curr_token_type = TokenType::SEMICOLON;
             } else if c == ':' {
                 curr_token_type = TokenType::COLON;
+            } else if c == '|' {
+                curr_token_type = TokenType::PIPE;
             } else {
                 return Err(LexErr { msg: String::from("Unknown token type") });
             }
