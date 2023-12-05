@@ -167,4 +167,9 @@ mod tests {
     fn practice_result() {
         assert_eq!(sln("./src/days/day_03/practice_input.txt"), 467835);
     }
+
+    #[test]
+    fn final_result() {
+        assert_eq!(sln("./src/days/day_03/input.txt"), 86841457);
+    }
 }

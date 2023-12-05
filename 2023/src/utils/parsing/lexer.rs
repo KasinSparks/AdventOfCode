@@ -2,6 +2,7 @@
 
 /// Lex a char stream input into tokens based on simple grammer
 
+#[derive(Debug)]
 pub struct Token {
     token_type: TokenType,
     data: String,
@@ -20,11 +21,11 @@ impl Token {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TokenType {
     WORD,
-    LETTER,
     NUMBER,
     SEMICOLON,
     COLON,
     WHITESPACE,
+    NEWLINE,
     DOT,
     COMMA,
     PIPE,
@@ -36,18 +37,24 @@ pub struct LexErr {
     msg: String,
 }
 
-pub struct Lexer {}
+pub struct Lexer {
+    data: String,
+}
 
 impl Lexer {
-    pub fn lex(char_stream: &[char]) -> Result<Vec<Token>, LexErr> {
+    pub fn new(data: String) -> Self {
+        return Lexer {
+            data: data
+        };
+    }
+
+    pub fn lex(&self) -> Result<Vec<Token>, LexErr> {
         let mut tokens: Vec<Token> = Vec::new();
 
         let mut temp_buf: String = String::from("");
-        let mut curr_pos: usize = 0;
         let mut last_token_type: TokenType = TokenType::UNKNOWN;
 
-        while curr_pos < char_stream.len() {
-            let c = char_stream[curr_pos];
+        for c in self.data.chars() {
             //let mut curr_token_type: TokenType = TokenType::UNKNOWN;
             let curr_token_type: TokenType;
 
@@ -61,7 +68,11 @@ impl Lexer {
             } else if c.is_ascii_digit() {
                 curr_token_type = TokenType::NUMBER;
             } else if c.is_ascii_whitespace() {
-                curr_token_type = TokenType::WHITESPACE;
+                if c == '\n' {
+                    curr_token_type = TokenType::NEWLINE;
+                } else {
+                    curr_token_type = TokenType::WHITESPACE;
+                }
             } else if c == ',' {
                 curr_token_type = TokenType::COMMA;
             } else if c == '.' {
@@ -76,20 +87,14 @@ impl Lexer {
                 return Err(LexErr { msg: String::from("Unknown token type") });
             }
 
-            let cc = Lexer::consume(char_stream, &mut curr_pos);
-            match cc {
-                Ok(c) => {
-                    // TODO: Change how it gets the first token
-                    if last_token_type == TokenType::UNKNOWN {
-                        // skip
-                    } else if curr_token_type != last_token_type {
-                        tokens.push(Token {token_type: last_token_type, data: temp_buf.clone()});
-                        temp_buf.clear();
-                    }
-                    temp_buf.push(c);
-                },
-                Err(e) => {return Err(e);}
-            };
+            // TODO: Change how it gets the first token
+            if last_token_type == TokenType::UNKNOWN {
+                // skip
+            } else if curr_token_type != last_token_type {
+                tokens.push(Token {token_type: last_token_type, data: temp_buf.clone()});
+                temp_buf.clear();
+            }
+            temp_buf.push(c);
 
             last_token_type = curr_token_type;
         }
@@ -103,20 +108,6 @@ impl Lexer {
         // TODO
         return Ok(tokens);
     }
-
-    fn peek(char_stream: &[char], index: usize) -> Result<char, LexErr> {
-        if index >= char_stream.len() {
-            return Err(LexErr{ msg: String::from("index out of bounds.") });
-        }
-        return Ok(char_stream[index]);
-    }
-
-    fn consume(char_stream: &[char], index: &mut usize) -> Result<char, LexErr> {
-        let result = Lexer::peek(char_stream, *index);
-        *index += 1;
-
-        return result;
-    }
 }
 
 
@@ -126,40 +117,41 @@ mod tests {
 
     #[test]
     fn test1() {
-        let test = ['t', 'e', 's', 't'];
-        let result = Lexer::lex(&test).unwrap();
+        let lexer = Lexer::new(String::from("test"));
+        let result = lexer.lex().unwrap();
         assert_eq!(result.len(), 1);
-        //assert_eq!(sln("./src/days/day_02/practice_input.txt"), 2286);
     }
 
     #[test]
     fn test2() {
-        let test = ['t', 'e', 's', 't', ' ', 't', 'e', 's', 't', '2', ' ', '4', '2'];
-        let result = Lexer::lex(&test).unwrap();
+        let lexer = Lexer::new(String::from("test \ntest2 42"));
+        let result = lexer.lex().unwrap();
         // length 
-        assert_eq!(result.len(), 6);
+        assert_eq!(result.len(), 7);
         
         // type
         assert_eq!(result[0].token_type, TokenType::WORD);
         assert_eq!(result[1].token_type, TokenType::WHITESPACE);
-        assert_eq!(result[2].token_type, TokenType::WORD);
-        assert_eq!(result[3].token_type, TokenType::NUMBER);
-        assert_eq!(result[4].token_type, TokenType::WHITESPACE);
-        assert_eq!(result[5].token_type, TokenType::NUMBER);
+        assert_eq!(result[2].token_type, TokenType::NEWLINE);
+        assert_eq!(result[3].token_type, TokenType::WORD);
+        assert_eq!(result[4].token_type, TokenType::NUMBER);
+        assert_eq!(result[5].token_type, TokenType::WHITESPACE);
+        assert_eq!(result[6].token_type, TokenType::NUMBER);
 
         // data
         assert_eq!(result[0].data, String::from("test"));
         assert_eq!(result[1].data, String::from(" "));
-        assert_eq!(result[2].data, String::from("test"));
-        assert_eq!(result[3].data, String::from("2"));
-        assert_eq!(result[4].data, String::from(" "));
-        assert_eq!(result[5].data, String::from("42"));
+        assert_eq!(result[2].data, String::from("\n"));
+        assert_eq!(result[3].data, String::from("test"));
+        assert_eq!(result[4].data, String::from("2"));
+        assert_eq!(result[5].data, String::from(" "));
+        assert_eq!(result[6].data, String::from("42"));
     }
 
     #[test]
     fn test3() {
-        let test: Vec<char> = "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red".chars().collect();
-        let result = Lexer::lex(&test).unwrap();
+        let lexer = Lexer::new(String::from("Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red"));
+        let result = lexer.lex().unwrap();
         // length 
         assert_eq!(result.len(), 43);
 

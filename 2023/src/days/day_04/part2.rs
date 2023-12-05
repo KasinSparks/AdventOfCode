@@ -17,8 +17,8 @@ pub fn sln(input_path: &str) -> i32 {
     let mut cards: Vec<Card> = Vec::new();
 
     for line in input {
-        let char_line: Vec<char> = line.chars().collect();
-        if let Ok(tokens) = lexer::Lexer::lex(&char_line) {
+        let lexer = lexer::Lexer::new(line);
+        if let Ok(tokens) = lexer.lex() {
             let mut curr_pos: usize = 0;
             let mut card: Card = Card {
                 id: 0,
@@ -112,5 +112,10 @@ mod tests {
     #[test]
     fn practice_result() {
         assert_eq!(sln("./src/days/day_04/practice_input.txt"), 30);
+    }
+
+    #[test]
+    fn final_result() {
+        assert_eq!(sln("./src/days/day_04/input.txt"), 18846301);
     }
 }
