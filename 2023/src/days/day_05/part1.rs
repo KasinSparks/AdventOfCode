@@ -112,6 +112,8 @@ pub fn sln(input_path: &str) -> i32 {
                 s.push_str(tokens[0].get_data());
                 s.push_str(tokens[1].get_data());
                 s.push_str(tokens[2].get_data());
+                s.push_str(tokens[3].get_data());
+                s.push_str(tokens[4].get_data());
 
                 map_type = TransitionMapType::from_str(&s);
                 assert!(map_type != TransitionMapType::UNK);

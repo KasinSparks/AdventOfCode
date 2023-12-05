@@ -1,6 +1,6 @@
 use std::collections::{HashSet, HashMap};
 
-use crate::utils::{io::{read_file, read_file_split_newlines}, parsing::lexer::{Lexer, TokenType}, bytes_to_num::bytes_to_num};
+use crate::utils::{io::{read_file, read_file_split_newlines}, parsing::lexer::{Lexer, TokenType}, bytes_to_num::bytes_to_num, perf::timing::Timer};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 enum TransitionMapType {
@@ -102,6 +102,8 @@ pub fn sln(input_path: &str) -> i32 {
                 s.push_str(tokens[0].get_data());
                 s.push_str(tokens[1].get_data());
                 s.push_str(tokens[2].get_data());
+                s.push_str(tokens[3].get_data());
+                s.push_str(tokens[4].get_data());
 
                 map_type = TransitionMapType::from_str(&s);
                 assert!(map_type != TransitionMapType::UNK);
@@ -238,7 +240,7 @@ mod tests {
     /*
     #[test]
     fn final_result() {
-        assert_eq!(sln("./src/days/day_05/input.txt"), );
+        assert_eq!(sln("./src/days/day_05/input.txt"), 6082852);
     }
     */
 }
