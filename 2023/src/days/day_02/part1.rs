@@ -150,4 +150,9 @@ mod tests {
     fn practice_result() {
         assert_eq!(sln("./src/days/day_02/practice_input.txt"), 8);
     }
+
+    #[test]
+    fn final_result() {
+        assert_eq!(sln("./src/days/day_02/input.txt"), 2512);
+    }
 }
