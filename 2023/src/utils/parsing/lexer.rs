@@ -84,7 +84,8 @@ impl Lexer {
             } else if c == '|' {
                 curr_token_type = TokenType::PIPE;
             } else {
-                return Err(LexErr { msg: String::from("Unknown token type") });
+                curr_token_type = TokenType::UNKNOWN;
+                //return Err(LexErr { msg: format!("Unable to convert: {} into a token.", c) });
             }
 
             // TODO: Change how it gets the first token
