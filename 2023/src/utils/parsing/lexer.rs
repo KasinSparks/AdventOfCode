@@ -24,11 +24,13 @@ pub enum TokenType {
     NUMBER,
     SEMICOLON,
     COLON,
-    WHITESPACE,
     NEWLINE,
     DOT,
     COMMA,
     PIPE,
+    TAB,
+    SPACE,
+    STAR,
     UNKNOWN,
 }
 
@@ -51,63 +53,92 @@ impl Lexer {
     pub fn lex(&self) -> Result<Vec<Token>, LexErr> {
         let mut tokens: Vec<Token> = Vec::new();
 
-        let mut temp_buf: String = String::from("");
-        let mut last_token_type: TokenType = TokenType::UNKNOWN;
+        let c_stream = self.data.as_str();
+        let mut index: usize = 0;
+        let mut c_ptr: usize = 0;
 
-        for c in self.data.chars() {
-            //let mut curr_token_type: TokenType = TokenType::UNKNOWN;
-            let curr_token_type: TokenType;
+        // Kick it off
+        // Lex all of the characters
+        while let Some(next_char) = Self::peek(c_stream, &index) {
 
-            // Only handle ascii right now
-            if !c.is_ascii() {
-                return Err(LexErr {msg: String::from("Not an ascii character")});
-            }
+            match next_char {
+                'a'..='z' | 'A'..='Z' => {
+                    // Letters
+                    while let Some(ch) = Self::peek(c_stream, &mut index) {
+                        match ch {
+                            'a'..='z' | 'A'..='Z' => {
+                                Self::consume(c_stream, &mut index);
+                            },
+                            _ => { break; }
+                        }
+                    }
 
-            if c.is_ascii_alphabetic() {
-                curr_token_type = TokenType::WORD;
-            } else if c.is_ascii_digit() {
-                curr_token_type = TokenType::NUMBER;
-            } else if c.is_ascii_whitespace() {
-                if c == '\n' {
-                    curr_token_type = TokenType::NEWLINE;
-                } else {
-                    curr_token_type = TokenType::WHITESPACE;
-                }
-            } else if c == ',' {
-                curr_token_type = TokenType::COMMA;
-            } else if c == '.' {
-                curr_token_type = TokenType::DOT;
-            } else if c == ';' {
-                curr_token_type = TokenType::SEMICOLON;
-            } else if c == ':' {
-                curr_token_type = TokenType::COLON;
-            } else if c == '|' {
-                curr_token_type = TokenType::PIPE;
-            } else {
-                curr_token_type = TokenType::UNKNOWN;
-                //return Err(LexErr { msg: format!("Unable to convert: {} into a token.", c) });
-            }
+                    tokens.push(Token { token_type: TokenType::WORD, data: c_stream[c_ptr..index].to_string() });
+                    c_ptr = index;
+                },
+                '0'..='9' => {
+                    // Numbers
+                    while let Some(ch) = Self::peek(c_stream, &mut index) {
+                        match ch {
+                            '0'..='9' => {
+                                Self::consume(c_stream, &mut index);
+                            },
+                            _ => { break; }
+                        }
+                    }
 
-            // TODO: Change how it gets the first token
-            if last_token_type == TokenType::UNKNOWN {
-                // skip
-            } else if curr_token_type != last_token_type {
-                tokens.push(Token {token_type: last_token_type, data: temp_buf.clone()});
-                temp_buf.clear();
-            }
-            temp_buf.push(c);
+                    tokens.push(Token { token_type: TokenType::NUMBER, data: c_stream[c_ptr..index].to_string() });
+                    c_ptr = index;
+                },
+                '\n' | '\t' | ' ' |
+                '\x21'..='\x2F' |
+                '\x3A'..='\x40' |
+                '\x5B'..='\x60' |
+                '\x7B'..='\x7E' => {
+                    // Whitespace chars and Symbols
+                    let tt = match next_char {
+                        '\n' => { TokenType::NEWLINE },
+                        '\t' => { TokenType::TAB },
+                        ' '  => { TokenType::SPACE },
+                        '|' => { TokenType::PIPE},
+                        ':' => { TokenType::COLON},
+                        ';'  => { TokenType::SEMICOLON},
+                        '.'  => { TokenType::DOT},
+                        ','  => { TokenType::COMMA},
+                        '*'  => { TokenType::STAR},
+                        _    => { TokenType::UNKNOWN }
+                    };
 
-            last_token_type = curr_token_type;
+                    let c = Self::consume(c_stream, &mut index).unwrap();
+
+                    tokens.push(Token { token_type: tt, data: String::from(c) });
+                    c_ptr = index;
+                },
+                '\x00'..='\x1F' => {
+                    // Ignore these control characters
+                },
+                _ => { todo!("Unmatched char: {}", next_char); }
+            };
+
         }
 
-        // Check if we need to flush buffer
-        if !temp_buf.is_empty() {
-            tokens.push(Token {token_type: last_token_type, data: temp_buf.clone()});
-            temp_buf.clear();
-        }
-
-        // TODO
         return Ok(tokens);
+    }
+
+    fn peek(s: &str, index: &usize) -> Option<char> {
+        if let Some(ss) = s.get(*index..*index + 1) {
+            return ss.chars().next();
+        }
+
+        return None;
+    }
+
+    fn consume(s: &str, index: &mut usize) -> Option<char> {
+        let result = Self::peek(s, index);
+        if result.is_some() {
+            *index += 1;
+        }
+        return result;
     }
 }
 
@@ -132,11 +163,11 @@ mod tests {
         
         // type
         assert_eq!(result[0].token_type, TokenType::WORD);
-        assert_eq!(result[1].token_type, TokenType::WHITESPACE);
+        assert_eq!(result[1].token_type, TokenType::SPACE);
         assert_eq!(result[2].token_type, TokenType::NEWLINE);
         assert_eq!(result[3].token_type, TokenType::WORD);
         assert_eq!(result[4].token_type, TokenType::NUMBER);
-        assert_eq!(result[5].token_type, TokenType::WHITESPACE);
+        assert_eq!(result[5].token_type, TokenType::SPACE);
         assert_eq!(result[6].token_type, TokenType::NUMBER);
 
         // data
@@ -153,52 +184,55 @@ mod tests {
     fn test3() {
         let lexer = Lexer::new(String::from("Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red"));
         let result = lexer.lex().unwrap();
+
+        //println!("{:#?}", result);
+
         // length 
         assert_eq!(result.len(), 43);
 
         let expected_tts = [
             TokenType::WORD,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::NUMBER,
             TokenType::COLON,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::NUMBER,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::WORD,
             TokenType::COMMA,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::NUMBER,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::WORD,
             TokenType::COMMA,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::NUMBER,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::WORD,
             TokenType::SEMICOLON,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::NUMBER,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::WORD,
             TokenType::COMMA,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::NUMBER,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::WORD,
             TokenType::SEMICOLON,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::NUMBER,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::WORD,
             TokenType::COMMA,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::NUMBER,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::WORD,
             TokenType::COMMA,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::NUMBER,
-            TokenType::WHITESPACE,
+            TokenType::SPACE,
             TokenType::WORD,
         ];
 

@@ -1,3 +1,5 @@
+use std::fmt;
+
 
 /// (Y, X)
 const EIGHT_WAY_NEIGHBORS: [NeighborLocationData<i8>; 8] = [
@@ -68,7 +70,7 @@ pub struct Grid2D<T> {
     data: Vec<Vec<Option<T>>>,
 }
 
-impl<T: Copy> Grid2D<T> {
+impl<T: Copy + fmt::Display> Grid2D<T> {
     pub fn new(num_rows: usize, num_cols: usize) -> Grid2D<T> {
         let mut grid: Grid2D<T> = Grid2D {
             size_rows: num_rows,
@@ -159,6 +161,35 @@ impl<T: Copy> Grid2D<T> {
         return (p.y >= 0 && p.y < self.size_rows as i32) && (p.x >= 0 && p.x < self.size_cols as i32);
     }
 }
+
+impl<T: fmt::Display> fmt::Display for Grid2D<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut s = String::new();
+
+        for (i, row) in (&self.data).iter().enumerate() {
+            for (j, cell) in row.iter().enumerate() {
+                match cell {
+                    Some(val) => {
+                        s.push_str((*val).to_string().as_str());
+                    },
+                    None => {}
+                };
+
+                if j < row.len() - 1 {
+                    s.push_str(", ");
+                }
+            }
+
+            if i < self.data.len() - 1 {
+                s.push('\n');
+            }
+        }
+
+        return write!(f, "{}", s);
+    }
+}
+
+
 
 #[cfg(test)]
 mod tests {
@@ -292,5 +323,21 @@ mod tests {
                 }
             ]
         );
+    }
+
+    #[test]
+    fn print_test() {
+        let mut grid: Grid2D<u8> = Grid2D::new(4, 4);
+        let mut i: u8 = 0;
+        for c in &mut grid.data {
+            for cell in c {
+                *cell = Some(i);
+                i += 1;
+            }
+        }
+
+
+        let expected: &str = "0, 1, 2, 3\n4, 5, 6, 7\n8, 9, 10, 11\n12, 13, 14, 15";
+        assert_eq!(grid.to_string(), expected);
     }
 }
