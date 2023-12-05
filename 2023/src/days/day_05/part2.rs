@@ -134,7 +134,7 @@ pub fn sln(input_path: &str) -> i32 {
     println!("Seeds: {:#?}", seed_ids);
     println!("Maps: {:#?}", maps);
 
-    //let mut results = Vec::new();
+    let mut results = Vec::new();
 
     let mut actual_seed_ids: Vec<(usize, usize)> = Vec::new();
 
@@ -146,54 +146,84 @@ pub fn sln(input_path: &str) -> i32 {
 
     println!("asis: {:#?}", actual_seed_ids);
 
-    let mut datas = Vec::new();
 
-    datas.push(maps.get(&TransitionMapType::SeedToSoil).unwrap());
-    datas.push(maps.get(&TransitionMapType::SoilToFertilizer).unwrap());
-    datas.push(maps.get(&TransitionMapType::FertilizerToWater).unwrap());
-    datas.push(maps.get(&TransitionMapType::WaterToLight).unwrap());
-    datas.push(maps.get(&TransitionMapType::LightToTemperature).unwrap());
-    datas.push(maps.get(&TransitionMapType::TemperatureToHumidity).unwrap());
-    datas.push(maps.get(&TransitionMapType::HumidityToLocation).unwrap());
-
-    let mut lowest_location_num = usize::MAX;
+    //let mut lowest_location_num = usize::MAX;
     let mut ss = 0;
 
+    let (tx, rx) = std::sync::mpsc::channel();
+    let mut handles = vec![];
+
+    let mut tid = 0;
     for asi in actual_seed_ids {
         println!("starting asi with range: {}..{}", asi.0, asi.0 + asi.1);
-        for seed in (asi.0)..(asi.0 + asi.1) {
-            let mut val: usize = seed;
 
-            for d in &datas {
-                for t in *d {
-                    if let Some(v) = t.get_dest_val(val) {
-                        val = v;
-                        break;
+        let datas = [
+            maps.get(&TransitionMapType::SeedToSoil).unwrap().clone(),
+            maps.get(&TransitionMapType::SoilToFertilizer).unwrap().clone(),
+            maps.get(&TransitionMapType::FertilizerToWater).unwrap().clone(),
+            maps.get(&TransitionMapType::WaterToLight).unwrap().clone(),
+            maps.get(&TransitionMapType::LightToTemperature).unwrap().clone(),
+            maps.get(&TransitionMapType::TemperatureToHumidity).unwrap().clone(),
+            maps.get(&TransitionMapType::HumidityToLocation).unwrap().clone()
+        ];
+
+        //let datas2 = datas.clone();
+        let tx1 = tx.clone();
+        let handle = std::thread::spawn(move || {
+            println!("Spawned thread[{}] for range {}..{}.", tid, asi.0, asi.0 + asi.1);
+            let mut lowest_location_num = usize::MAX;
+            for seed in (asi.0)..(asi.0 + asi.1) {
+                let mut val: usize = seed;
+
+                for d in &datas {
+                    for t in d {
+                        if let Some(v) = t.get_dest_val(val) {
+                            val = v;
+                            break;
+                        }
                     }
+                    //println!("Seed: {}, val: {}", seed, val);
                 }
+
                 //println!("Seed: {}, val: {}", seed, val);
+                //results.push(val);
+                if val < lowest_location_num {
+                    lowest_location_num = val;
+                    //ss = seed;
+                }
             }
 
-            //println!("Seed: {}, val: {}", seed, val);
-            //results.push(val);
-            if val < lowest_location_num {
-                lowest_location_num = val;
-                ss = seed;
-            }
-        }
+            println!("Thread[{}] done!", tid);
+            tx1.send(lowest_location_num).unwrap();
+        });
 
-        println!("Done with one asi");
+        tid += 1;
+
+        handles.push(handle);
+
+        //println!("Done with one asi");
     }
 
-    //results.sort();
+    let n = handles.len();
 
-    println!("seed number: {}", ss);
-    println!("result: {}", lowest_location_num);
+    for h in handles {
+        h.join().unwrap();
+        //println!("msg: {:#?}", rx.recv());
+    }
 
-    //assert!(results[0] < i32::MAX as usize);
-    //return results[0] as i32;
-    assert!(lowest_location_num < i32::MAX as usize);
-    return lowest_location_num as i32;
+    for i in 0..n {
+        results.push(rx.recv().unwrap());
+    }
+
+    results.sort();
+
+    //println!("seed number: {}", ss);
+    //println!("result: {}", lowest_location_num);
+
+    assert!(results[0] < i32::MAX as usize);
+    return results[0] as i32;
+    //assert!(lowest_location_num < i32::MAX as usize);
+    //return lowest_location_num as i32;
 }
 
 #[cfg(test)]
