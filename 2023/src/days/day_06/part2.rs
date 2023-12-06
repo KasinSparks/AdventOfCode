@@ -40,32 +40,19 @@ pub fn sln(input_path: &str) -> usize {
 
     println!("Boats: {:?}", races);
 
-    // simple sol
-    let mut num_winning_times: Vec<usize> = Vec::new();
+    let mut result: usize = 0;
 
-    for race in races {
-        let mut num_won = 0;
+    //let total_time = races[0].time as i64;
+    let total_time = races[0].time as f64;
+    let total_dist= races[0].distance as i64;
 
-        for i in 0..(race.time) as usize{
-            let speed: usize = i;
+    // quadratic formula
+    let time_part = f64::sqrt((f64::powi(total_time, 2) - (4.0 * total_dist as f64)) as f64);
 
-            let distance: usize = speed * ((race.time as usize) - i);
+    // Trim the range so we are "inside" of the valid times
+    let t_range = (((time_part + total_time) / 2.0).ceil() - 1.0, ((time_part - total_time) / 2.0).ceil());
 
-            if distance > race.distance as usize {
-                num_won += 1;
-            }
-        }
-
-        num_winning_times.push(num_won);
-    }
-
-    let mut result: usize = 1;
-
-    println!("num won: {}", num_winning_times[0]);
-
-    for t in num_winning_times {
-        result *= t;
-    }
+    result = (t_range.0 + t_range.1) as usize;
 
     return result;
 }
@@ -79,10 +66,8 @@ mod tests {
         assert_eq!(sln("./src/days/day_06/practice_input.txt"), 71503);
     }
 
-    /*
     #[test]
     fn final_result() {
-        assert_eq!(sln("./src/days/day_06/input.txt"), 0);
+        assert_eq!(sln("./src/days/day_06/input.txt"), 21039729);
     }
-    */
 }
