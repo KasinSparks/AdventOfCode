@@ -3,7 +3,7 @@ pub struct BytesToNumErr {
     msg: String,
 }
 
-pub fn bytes_to_num(nums: &[u8]) -> Result<u32, BytesToNumErr> {
+pub fn bytes_to_num(nums: &[u8]) -> Result<usize, BytesToNumErr> {
     let l = nums.len();
     let mut result = 0;
 
@@ -12,7 +12,7 @@ pub fn bytes_to_num(nums: &[u8]) -> Result<u32, BytesToNumErr> {
             return Err(BytesToNumErr { msg: String::from("Non-ascii digit.") });
         }
 
-        result += u32::pow(10, i as u32) * (nums[(l - 1) - i] - '0' as u8) as u32;
+        result += usize::pow(10, i as u32) * (nums[(l - 1) - i] - '0' as u8) as usize;
     }
 
     return Ok(result);

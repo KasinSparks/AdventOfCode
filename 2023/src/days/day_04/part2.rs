@@ -6,9 +6,9 @@ use std::collections::hash_map::HashMap;
 
 #[derive(Debug)]
 struct Card {
-    id: u32,
-    winning_nums: Vec<u32>,
-    marked_nums:  Vec<u32>,
+    id: usize,
+    winning_nums: Vec<usize>,
+    marked_nums:  Vec<usize>,
 }
 
 pub fn sln(input_path: &str) -> i32 {
@@ -57,8 +57,8 @@ pub fn sln(input_path: &str) -> i32 {
         }
     }
 
-    let mut counts: HashMap<u32, u32> = HashMap::new();
-    let mut copies: HashMap<u32, u32> = HashMap::new();
+    let mut counts: HashMap<usize, usize> = HashMap::new();
+    let mut copies: HashMap<usize, usize> = HashMap::new();
 
     for card in &cards {
         counts.insert(card.id, 0); 
@@ -87,11 +87,11 @@ pub fn sln(input_path: &str) -> i32 {
 
     for id in 1..cards.len() + 1 {
         // The number of cards we currently have a given card will by the multiplier factor
-        let modifier = *(copies.get(&(id as u32)).unwrap());
+        let modifier = *(copies.get(&(id)).unwrap());
 
-        let num_next_cards = counts.get(&(id as u32)).unwrap();
+        let num_next_cards = counts.get(&(id)).unwrap();
         for i in 1..num_next_cards + 1{
-            if let Some(val) = copies.get_mut(&((id as u32) + i)) {
+            if let Some(val) = copies.get_mut(&((id) + i)) {
                 *val += modifier;
             }
         }
