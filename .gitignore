@@ -5,4 +5,5 @@ venv/*
 2023/target/*
 2023/**/*.txt
 Cargo.lock
+2023/src/days/**/part2_copy.rs
 

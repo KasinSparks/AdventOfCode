@@ -4,9 +4,9 @@ use crate::utils::bytes_to_num::bytes_to_num;
 
 #[derive(Debug)]
 struct Card {
-    id: u32,
-    winning_nums: Vec<u32>,
-    marked_nums:  Vec<u32>,
+    id: usize,
+    winning_nums: Vec<usize>,
+    marked_nums:  Vec<usize>,
 }
 
 pub fn sln(input_path: &str) -> i32 {
