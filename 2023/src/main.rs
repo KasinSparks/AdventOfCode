@@ -21,8 +21,13 @@ fn main() {
     //let result = day_04::part2::sln("./src/days/day_04/input.txt");
     //let result = day_05::part1::sln("./src/days/day_05/input.txt");
     //let result = day_05::part2::sln("./src/days/day_05/input.txt");
+    //let result = day_05::part2_copy::sln("./src/days/day_05/input.txt");
     //let result = day_06::part1::sln("./src/days/day_06/input.txt");
-    let result = day_06::part2::sln("./src/days/day_06/input.txt");
+    //let result = day_06::part2::sln("./src/days/day_06/input.txt");
+    //let result = day_07::part1::sln("./src/days/day_07/input.txt");
+    //let result = day_07::part2::sln("./src/days/day_07/input.txt");
+    //let result = day_08::part1::sln("./src/days/day_08/input.txt");
+    let result = day_08::part2::sln("./src/days/day_08/input.txt");
     timer.end();
     println!("{}", timer);
     println!("Result: {}", result);
