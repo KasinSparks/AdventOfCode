@@ -27,7 +27,9 @@ fn main() {
     //let result = day_07::part1::sln("./src/days/day_07/input.txt");
     //let result = day_07::part2::sln("./src/days/day_07/input.txt");
     //let result = day_08::part1::sln("./src/days/day_08/input.txt");
-    let result = day_08::part2::sln("./src/days/day_08/input.txt");
+    //let result = day_08::part2::sln("./src/days/day_08/input.txt");
+    //let result = day_09::part1::sln("./src/days/day_09/input.txt");
+    let result = day_09::part2::sln("./src/days/day_09/input.txt");
     timer.end();
     println!("{}", timer);
     println!("Result: {}", result);
