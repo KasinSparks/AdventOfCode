@@ -32,7 +32,7 @@ pub enum NeighborWay {
     FourWayDiagonal,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Point<T> {
     pub x: T,
     pub y: T,
@@ -52,14 +52,15 @@ pub enum NeighborDirection {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct NeighborLocationData<T> {
-    point: Point<T>,
-    direction: NeighborDirection,
+    pub point: Point<T>,
+    pub direction: NeighborDirection,
 }
+
 
 #[derive(Debug, PartialEq)]
 pub struct NeighborData<T> {
-    loc: NeighborLocationData<usize>,
-    data: Option<T>,
+    pub loc: NeighborLocationData<usize>,
+    pub data: Option<T>,
 }
 
 #[derive(Debug)]
@@ -159,6 +160,23 @@ impl<T: Copy + fmt::Display> Grid2D<T> {
     fn bounds_check(&self, p: Point<i32>) -> bool {
         // Less than Zero is handled by type
         return (p.y >= 0 && p.y < self.size_rows as i32) && (p.x >= 0 && p.x < self.size_cols as i32);
+    }
+
+    pub fn print_raw(&self) {
+        for (i, row) in (&self.data).iter().enumerate() {
+            for (j, cell) in row.iter().enumerate() {
+                match cell {
+                    Some(val) => {
+                        print!("{}", (*val).to_string().as_str());
+                    },
+                    None => {}
+                };
+            }
+
+            if i < self.data.len() - 1 {
+                println!();
+            }
+        }
     }
 }
 
