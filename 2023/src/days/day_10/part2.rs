@@ -249,6 +249,7 @@ pub fn sln(input_path: &str) -> i32 {
     let mut left_values: Vec<Point<usize>> = Vec::new();
     let mut right_values: Vec<Point<usize>> = Vec::new();
 
+    println!("test --");
     for row in 0..grid.get_size().0 {
         for col in 0..grid.get_size().1 {
             let p = Point {x: col, y: row};
@@ -268,7 +269,7 @@ pub fn sln(input_path: &str) -> i32 {
                 );
                 print!("{}", s);
             } else {
-                print!("{}", '.');
+                print!("{}", '*');
             }
         }
         println!();
@@ -323,16 +324,16 @@ pub fn sln(input_path: &str) -> i32 {
     left_values.append(&mut right_values);
 
 
-
-    for row in 0..grid.get_size().0 {
-        for col in 0..grid.get_size().1 {
+    println!("HERE");
+    for row in 0..path_grid.get_size().0 {
+        for col in 0..path_grid.get_size().1 {
             let p = Point {x: col, y: row};
             //temp_grid.set(p, &' ');
             if left_values.contains(&p) {
                 print!("X");
             } else if actual_complete_path.contains(&p) {
                 let mut s = String::from(
-                    match PipeType::get_char(grid.get(p).unwrap().unwrap()).unwrap() {
+                    match PipeType::get_char(path_grid.get(p).unwrap().unwrap()).unwrap() {
                         '-' => "─",
                         'L' => "└",
                         'J' => "┘",
@@ -567,9 +568,13 @@ pub fn sln(input_path: &str) -> i32 {
 
     return hm.len() as i32;
     */
+    let temp = StringColor::colorize_string("X",StringColor::BrightCyan);
     for row in 0..final_grid.get_size().0 {
         for col in 0..final_grid.get_size().1 {
             let p = Point {x: col, y: row};
+            if p == trackers.0.0 || p == trackers.1.0 {
+                print!("{}", StringColor::colorize_string("G", StringColor::BrightOrange));
+            }
             //temp_grid.set(p, &' ');
             //if left_values.contains(&p) {
             let s = final_grid.get(p).unwrap().unwrap();
@@ -581,7 +586,7 @@ pub fn sln(input_path: &str) -> i32 {
                 'F' => "┌",
                 '7' => "┐",
                 'S' => "S",
-                'X' => "X",
+                'X' => temp.as_str(),
                 _ => "*"
             };
             print!("{}", o);
@@ -711,13 +716,8 @@ mod tests {
         assert_eq!(sln("./src/days/day_10/p2_practice_input4.txt"), 10);
     }
 
-    /*
-    // 247 too low
-    // 350 too low
-    // 364 too high
     #[test]
     fn final_result() {
-        assert_eq!(sln("./src/days/day_10/input.txt"), 0);
+        assert_eq!(sln("./src/days/day_10/input.txt"), 351);
     }
-    */
 }
