@@ -5,24 +5,26 @@ for l in f.readlines():
     lines.append(l.rstrip())
 
 
-left_list = []
-right_list = []
+left_list = {} 
+right_list = {} 
 for l in lines:
     ls = l.split("   ")
-    left_list.append(ls[0])
-    right_list.append(ls[-1])
+    if (int(ls[0]) in left_list):
+        left_list[int(ls[0])] += 1
+    else:
+        left_list[int(ls[0])] = 1
 
-left_list.sort()
-right_list.sort()
+    if (int(ls[-1]) in right_list):
+        right_list[int(ls[-1])] += 1
+    else:
+        right_list[int(ls[-1])] = 1
 
 total = 0
-for ll in left_list:
-    #EWW
-    count = 0
-    for rr in right_list:
-        if ll == rr:
-            count += 1
+for lk in left_list:
+    rv = 0
+    if right_list.get(lk) != None:
+        rv = right_list.get(lk)
 
-    total += int(ll) * count
+    total += lk * left_list[lk] * rv 
 
 print(total)
