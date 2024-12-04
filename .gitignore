@@ -7,3 +7,5 @@ venv/*
 Cargo.lock
 2023/src/days/**/part2_copy.rs
 input.txt
+sample_input.txt
+sample_input_2.txt
