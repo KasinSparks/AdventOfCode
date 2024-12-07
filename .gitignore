@@ -9,3 +9,4 @@ Cargo.lock
 input.txt
 sample_input.txt
 sample_input_2.txt
+*.old
